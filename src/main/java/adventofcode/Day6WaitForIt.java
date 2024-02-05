@@ -15,17 +15,18 @@ public class Day6WaitForIt {
 
         PuzzleReader puzzleReader = new PuzzleReader("wait-for-it.txt");
 
-        List<List<Integer>> lines = puzzleReader.getLines()
+        // Part 1
+        List<List<Long>> lines = puzzleReader.getLines()
                 .stream()
                 .map(l -> l.replaceAll("\\D+:\\s+", "")
                         .split("\\s+"))
                 .map(a -> Arrays.stream(a)
-                        .mapToInt(Integer::parseInt)
+                        .mapToLong(Long::parseLong)
                         .boxed()
                         .toList())
                 .toList();
 
-        Map<Integer, List<List<Integer>>> linesBySize = lines.stream()
+        Map<Integer, List<List<Long>>> linesBySize = lines.stream()
                 .collect(Collectors.groupingBy(List::size));
 
         if (linesBySize.size() != 1)
@@ -45,23 +46,37 @@ public class Day6WaitForIt {
                 .map(Race::getRecordBreaker)
                 .filter(r -> Optional.ofNullable(r).isPresent())
                 .map(RecordBreaker::numberOfWaysToBreakRecord)
-                .reduce(1, (a, b) -> a * b));
+                .reduce(1L, (a, b) -> a * b));
+
+        // Part 2
+        List<Long> linesPart2 = puzzleReader.getLines()
+                .stream()
+                .map(l -> l.replaceAll("\\D+:|\\s+", ""))
+                .mapToLong(Long::parseLong)
+                .boxed()
+                .toList();
+
+        Race race = new Race(linesPart2.get(0), linesPart2.get(1));
+
+        Optional<RecordBreaker> recordBreaker = Optional.ofNullable(race.getRecordBreaker());
+
+        recordBreaker.ifPresent(breaker -> System.out.println(breaker.numberOfWaysToBreakRecord()));
     }
 
     private static class Race {
 
-        private int recordTime;
+        private long recordTime;
 
-        private int distance;
+        private long distance;
 
-        private Race(int recordTime, int distance) {
+        private Race(long recordTime, long distance) {
             this.recordTime = recordTime;
             this.distance = distance;
         }
 
         public RecordBreaker getRecordBreaker() {
-            int holdTime = recordTime;
-            int travelTime = 0;
+            long holdTime = recordTime;
+            long travelTime = 0;
 
             while (holdTime > travelTime) {
                 if (holdTime * travelTime > distance)
@@ -83,17 +98,17 @@ public class Day6WaitForIt {
 
         private static class Builder {
 
-            private int recordTime;
+            private long recordTime;
 
-            private int distance;
+            private long distance;
 
-            public Builder recordTime(int recordTime) {
+            public Builder recordTime(long recordTime) {
                 this.recordTime = recordTime;
 
                 return this;
             }
 
-            public Builder distance(int distance) {
+            public Builder distance(long distance) {
                 this.distance = distance;
 
                 return this;
@@ -107,16 +122,16 @@ public class Day6WaitForIt {
 
     public static class RecordBreaker {
 
-        private int holdFor;
+        private long holdFor;
 
-        private int travelFor;
+        private long travelFor;
 
-        private RecordBreaker(int holdFor, int travelFor) {
+        private RecordBreaker(long holdFor, long travelFor) {
             this.holdFor = holdFor;
             this.travelFor = travelFor;
         }
 
-        public int numberOfWaysToBreakRecord() {
+        public long numberOfWaysToBreakRecord() {
             return holdFor - travelFor + 1;
         }
 
@@ -126,17 +141,17 @@ public class Day6WaitForIt {
 
         private static class Builder {
 
-            private int holdFor;
+            private long holdFor;
 
-            private int travelFor;
+            private long travelFor;
 
-            public Builder holdFor(int holdFor) {
+            public Builder holdFor(long holdFor) {
                 this.holdFor = holdFor;
 
                 return this;
             }
 
-            public Builder travelFor(int travelFor) {
+            public Builder travelFor(long travelFor) {
                 this.travelFor = travelFor;
 
                 return this;
